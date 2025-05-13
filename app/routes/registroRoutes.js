@@ -12,5 +12,8 @@ router.get('/registro/:id', registroController.getRegistroById);
 router.put('/registro/:id', registroController.updateRegistro);
 //eliminar
 router.delete('/registro/:id', registroController.deleteRegistro);
+//PDF
+router.get('/registro/descarga/pdf', registroController.descargarRegistrosPDF);
+
 
 module.exports = router;

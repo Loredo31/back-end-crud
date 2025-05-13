@@ -1,4 +1,5 @@
 const Registro = require('../models/registroModel');
+const PDFDocument = require('pdfkit');
 
 //crear
 exports.createRegistro = async (req, res) => {
@@ -67,5 +68,39 @@ exports.deleteRegistro = async (req, res) => {
         res.json({ message: "Registro eliminado correctamente" });
     } catch (error) {
         res.status(500).json({ message: "Error al eliminar el registro", error });
+    }
+};
+
+//PDF
+exports.descargarRegistrosPDF = async (req, res) => {
+    try {
+        const registros = await Registro.find();
+
+        const doc = new PDFDocument();
+
+        //encabezado
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=Registros.pdf');
+
+        //envia PDF
+        doc.pipe(res);
+
+        //titulo
+        doc.fontSize(18).text('Lista de Registros', { align: 'center' });
+        doc.moveDown();
+
+        //contenido
+        registros.forEach((registro, i) => {
+            doc
+                .fontSize(12)
+                .text(
+                    `${i + 1}. Nombre: ${registro.nombre} ${registro.apellido} | Correo: ${registro.correo} | Teléfono: ${registro.telefono}`
+                );
+            doc.moveDown(0.5);
+        });
+
+        doc.end();
+    } catch (error) {
+        res.status(500).json({ message: 'Error al generar el PDF', error });
     }
 };
